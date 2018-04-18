@@ -96,6 +96,7 @@ public class FlowConfiguration {
         return IntegrationFlows.from("recoveryChannel")
                 .log(LoggingHandler.Level.ERROR, "error",
                         m -> m.getPayload())
+                .handle((p, h) -> null)
                 .get();
     }
 

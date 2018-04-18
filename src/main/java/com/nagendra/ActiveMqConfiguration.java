@@ -14,20 +14,34 @@ import javax.jms.ConnectionFactory;
 @Component
 public class ActiveMqConfiguration {
 
-    @Value("${activemq.broker-url}")
+    @Value("${activemq.broker.url}")
     private String brokerUrl;
+
+    @Value("${activemq.broker.username}")
+    private String username;
+
+    @Value("${activemq.broker.password}")
+    private String password;
 
     @Bean
     public ActiveMQConnectionFactory activeMQConnectionFactory() {
         ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory();
         activeMQConnectionFactory.setBrokerURL(brokerUrl);
-
+        activeMQConnectionFactory.setUserName(username);
+        activeMQConnectionFactory.setUserName(password);
         return activeMQConnectionFactory;
     }
-
 
     @Bean
     public CachingConnectionFactory cachingConnectionFactory() {
         return new CachingConnectionFactory(activeMQConnectionFactory());
     }
+
+//    @Bean
+//    public PooledConnectionFactory pooledConnectionFactory() {
+//        PooledConnectionFactory pooledConnectionFactory = new PooledConnectionFactory();
+//        pooledConnectionFactory.setConnectionFactory(activeMQConnectionFactory());
+//        pooledConnectionFactory.setMaxConnections(maxConnections);
+//        return pooledConnectionFactory;
+//    }
 }
