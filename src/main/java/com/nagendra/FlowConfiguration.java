@@ -1,7 +1,7 @@
 package com.nagendra;
 
-import com.nagendra.domain.Event;
-import com.nagendra.domain.EventType;
+import com.nagendra.vo.OrderVO;
+import com.nagendra.vo.OrderStatusType;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +33,7 @@ public class FlowConfiguration {
     @Autowired
     private ActiveMQConnectionFactory activeMQConnectionFactory;
 
-    @Value("${event.queue}")
+    @Value("${input.order.queue}")
     private String sourceQueue;
 
     @Bean
@@ -44,10 +44,10 @@ public class FlowConfiguration {
                 .configureListenerContainer(spec -> spec.get().setSessionTransacted(true)))
                 .log(LoggingHandler.Level.DEBUG, "dev", m -> m.getPayload())
                 .log(LoggingHandler.Level.DEBUG, "dev", m -> m.getHeaders())
-                .<Event, EventType>route(event -> event.getEventType(), mapping -> mapping
-                        .channelMapping(EventType.CREATE, "createFlow")
-                        .channelMapping(EventType.UPDATE, "createFlow")
-                        .channelMapping(EventType.DELETE, "createFlow")
+                .<OrderVO, OrderStatusType>route(orderVO -> orderVO.getOrderStatusType(), mapping -> mapping
+                        .channelMapping(OrderStatusType.CREATE, "createFlow")
+                        .channelMapping(OrderStatusType.UPDATE, "createFlow")
+                        .channelMapping(OrderStatusType.DELETE, "createFlow")
                         .defaultOutputChannel("nullChannel")
                         .resolutionRequired(false)
                 ).get();

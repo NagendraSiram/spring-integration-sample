@@ -1,16 +1,17 @@
 package com.nagendra.domain;
 
 /**
- * Created by nagendra on 17/04/2018.
+ * Created by nagendra on 26/04/2018.
  */
-
-public class Event {
+public class OrderDetails {
 
     private String id;
 
+    private String name;
+
     private String description;
 
-    private EventType eventType;
+    private String userId;
 
     public String getId() {
         return id;
@@ -24,16 +25,23 @@ public class Event {
         return description;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public EventType getEventType() {
-        return eventType;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setEventType(EventType eventType) {
-        this.eventType = eventType;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
-
 }
