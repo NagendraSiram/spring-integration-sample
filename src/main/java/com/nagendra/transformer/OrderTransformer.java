@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class OrderTransformer {
 
     @Transformer
-    public OrderDetails equals(OrderVO order, @Header String userId) {
+    public OrderDetails transform(OrderVO order, @Header String userId) {
         OrderDetails orderDetails = new OrderDetails();
         orderDetails.setId(order.getId());
         orderDetails.setName(order.getName());

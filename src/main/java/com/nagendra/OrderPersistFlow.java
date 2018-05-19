@@ -10,9 +10,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.handler.advice.IdempotentReceiverInterceptor;
 import org.springframework.integration.jms.dsl.Jms;
+import org.springframework.integration.selector.MetadataStoreSelector;
+import org.springframework.jms.listener.SimpleMessageListenerContainer;
 import org.springframework.jms.support.converter.MarshallingMessageConverter;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+
+import javax.jms.Session;
 
 /**
  * Created by nagendra on 24/04/2018.
@@ -35,18 +40,40 @@ public class OrderPersistFlow {
     @Bean
     public IntegrationFlow persistFlow() {
         return IntegrationFlows
-                .from(Jms.inboundGateway(activeMQConnectionFactory)
+                .from(Jms.messageDrivenChannelAdapter(activeMQConnectionFactory, SimpleMessageListenerContainer.class)
                         .id("orderInputChannel")
                         .destination(sourceQueue)
                         .jmsMessageConverter(new MarshallingMessageConverter(jaxbMarshaller()))
-                        .configureListenerContainer(spec -> spec.get().setSessionTransacted(true)))
+                        .configureListenerContainer(spec -> {
+                            spec.sessionTransacted(false);
+                            spec.sessionAcknowledgeMode(Session.DUPS_OK_ACKNOWLEDGE);
+//                            spec.cacheLevel(CACHE_SESSION);
+//                            spec.maxMessagesPerTask(50);
+//                            spec.concurrentConsumers(1);
+                        }))
                 .channel("beforeTransform")
-                .transform(orderTransformer)
+                .transform(orderTransformer, "transform", e -> e.advice(idempotentReceiverInterceptor()))
                 .handle(orderService, "save")
                 .get();
     }
 
-    private org.springframework.oxm.Marshaller jaxbMarshaller() {
+    @Bean
+    public IdempotentReceiverInterceptor idempotentReceiverInterceptor() {
+        IdempotentReceiverInterceptor idempotentReceiverInterceptor = new IdempotentReceiverInterceptor(new MetadataStoreSelector(m ->
+                (String) m.getHeaders().get("JMSMessageId")));
+        idempotentReceiverInterceptor.setDiscardChannelName("ignoreDuplicates");
+        idempotentReceiverInterceptor.setThrowExceptionOnRejection(false);
+        return idempotentReceiverInterceptor;
+    }
+
+    @Bean
+    public IntegrationFlow ignoreDuplicatesFlow(){
+        return IntegrationFlows.from("ignoreDuplicates")
+                .handle(message -> System.out.println("Duplicate:" + message))
+                .get();
+    }
+
+    private Jaxb2Marshaller jaxbMarshaller() {
         Jaxb2Marshaller jaxb2Marshaller = new Jaxb2Marshaller();
         jaxb2Marshaller.setMappedClass(OrderVO.class);
         jaxb2Marshaller.setPackagesToScan("com.nagendra.vo");

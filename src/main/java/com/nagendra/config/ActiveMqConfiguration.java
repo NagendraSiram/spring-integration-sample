@@ -1,4 +1,4 @@
-package com.nagendra;
+package com.nagendra.config;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
