@@ -41,7 +41,7 @@ public class OrderPersistFlow {
     public IntegrationFlow persistFlow() {
         return IntegrationFlows
                 .from(Jms.messageDrivenChannelAdapter(activeMQConnectionFactory, SimpleMessageListenerContainer.class)
-                        .id("orderInputChannel")
+                        .id("orderInputEndPoint")
                         .destination(sourceQueue)
                         .jmsMessageConverter(new MarshallingMessageConverter(jaxbMarshaller()))
                         .configureListenerContainer(spec -> {
@@ -51,7 +51,6 @@ public class OrderPersistFlow {
 //                            spec.maxMessagesPerTask(50);
 //                            spec.concurrentConsumers(1);
                         }))
-                .channel("beforeTransform")
                 .transform(orderTransformer, "transform", e -> e.advice(idempotentReceiverInterceptor()))
                 .handle(orderService, "save")
                 .get();

@@ -12,6 +12,14 @@ import javax.sql.DataSource;
  */
 public class MetaDataStoreConfiguration {
 
+    /*
+    CREATE TABLE INT_METADATA_STORE  (
+        METADATA_KEY VARCHAR(255) NOT NULL,
+        METADATA_VALUE VARCHAR(4000),
+        REGION VARCHAR(100) NOT NULL,
+        constraint METADATA_STORE primary key (METADATA_KEY, REGION)
+    );
+     */
     @Bean
     public MetadataStore metadataStore(DataSource dataSource){
         JdbcMetadataStore jdbcMetadataStore = new JdbcMetadataStore(dataSource);

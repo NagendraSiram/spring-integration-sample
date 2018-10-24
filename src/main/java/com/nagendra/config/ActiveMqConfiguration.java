@@ -34,7 +34,9 @@ public class ActiveMqConfiguration {
 
     @Bean
     public CachingConnectionFactory cachingConnectionFactory() {
-        return new CachingConnectionFactory(activeMQConnectionFactory());
+        CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(activeMQConnectionFactory());
+        cachingConnectionFactory.setSessionCacheSize(10);
+        return cachingConnectionFactory;
     }
 
 //    @Bean

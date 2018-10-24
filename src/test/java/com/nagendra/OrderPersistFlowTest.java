@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
  * Created by nagendra on 26/04/2018.
  */
 @RunWith(SpringRunner.class)
-@SpringIntegrationTest(noAutoStartup = "orderInputChannel")
+@SpringIntegrationTest(noAutoStartup = "orderInputEndPoint")
 public class OrderPersistFlowTest {
 
     @Autowired
@@ -32,7 +32,7 @@ public class OrderPersistFlowTest {
 
         MessageSource<OrderVO> messageSource = () -> new GenericMessage<>(orderVO);
 
-        this.mockIntegrationContext.substituteMessageSourceFor("beforeTransform", messageSource);
+        this.mockIntegrationContext.substituteMessageSourceFor("orderInputEndPoint", messageSource);
 
         //seeing the following error
         //org.springframework.beans.factory.NoSuchBeanDefinitionException: No bean named 'beforeTransform' available

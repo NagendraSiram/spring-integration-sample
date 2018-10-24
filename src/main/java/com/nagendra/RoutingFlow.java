@@ -20,6 +20,7 @@ import org.springframework.integration.handler.advice.RequestHandlerRetryAdvice;
 import org.springframework.integration.http.dsl.Http;
 import org.springframework.integration.http.support.DefaultHttpHeaderMapper;
 import org.springframework.integration.jms.dsl.Jms;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
@@ -50,7 +51,9 @@ public class RoutingFlow {
                 .destination(sourceQueue)
 //                .jmsMessageConverter()
                 .configureListenerContainer(spec -> spec.get().setSessionTransacted(true)))
+
                 .filter(OrderDetails.class, payload -> payload.getId() != null, filterEndpointSpec -> filterEndpointSpec.discardChannel("discardPayload"))
+//                .filter(Message.class, message -> message.getHeaders().get("something").equals("something")) //filter on header
 //                .split() //Used to convert a list with single item to item
                 .log(LoggingHandler.Level.DEBUG, "dev", m -> m.getPayload())
                 .log(LoggingHandler.Level.DEBUG, "dev", m -> m.getHeaders())
@@ -68,6 +71,7 @@ public class RoutingFlow {
     public IntegrationFlow performCreate() {
         return IntegrationFlows.from("createFlow")
                 .handle(Http.outboundGateway("http://localhost:8080/create")
+                                .mappedRequestHeaders("*", DefaultHttpHeaderMapper.ACCEPT, DefaultHttpHeaderMapper.CONTENT_TYPE)
                                 .httpMethod(HttpMethod.GET)
                                 .expectedResponseType(String.class)
                                 .requestFactory(simpleClientHttpRequestFactory()),
