@@ -1,0 +1,28 @@
+@startuml
+
+
+node "Service Monitor JVM" {
+  database "Monitor-DB"
+  [Monitor App] --> [Monitor-DB]
+}
+
+cloud "Azure" {
+  database "db2"
+  database "db1"
+  [Service 3]
+  [Service 2]
+  [Service 1]
+}
+
+
+[Monitor App] ..> [Service 1]
+[Monitor App] ..> [Service 2]
+[Monitor App] ..> [Service 3]
+[Monitor App] ..> [db1]
+[Monitor App] ..> [db2]
+
+node "Backend Node.js" {
+  [Web App] --> [Monitor-DB]
+}
+
+@enduml

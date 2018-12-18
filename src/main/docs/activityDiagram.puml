@@ -1,0 +1,10 @@
+@startuml
+start
+:fetch server details from DB;
+while (check Service Status ?) is (up)
+  :wait 10sec;
+endwhile (down)
+:"Monitor" Application checks;
+:This is defined on
+several **lines**;
+@enduml

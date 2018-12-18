@@ -1,0 +1,12 @@
+@startuml
+actor Bob #red
+participant Monitor as M
+participant "Azure Services" as AS #99FF99
+group Health Check
+ M --> AS : Check status
+ note left: every 10sec
+ AS --> M : UP/DOWN
+ note left: Down for 3 \nconsecutive \nattempts
+end
+M -> Bob : report to user
+@enduml

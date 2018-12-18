@@ -13,6 +13,7 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.handler.advice.IdempotentReceiverInterceptor;
 import org.springframework.integration.jms.dsl.Jms;
 import org.springframework.integration.selector.MetadataStoreSelector;
+import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.listener.SimpleMessageListenerContainer;
 import org.springframework.jms.support.converter.MarshallingMessageConverter;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
@@ -41,6 +42,7 @@ public class OrderPersistFlow {
     public IntegrationFlow persistFlow() {
         return IntegrationFlows
                 .from(Jms.messageDrivenChannelAdapter(activeMQConnectionFactory, SimpleMessageListenerContainer.class)
+                        //use DefaultMessageListenerContainer for auto reconnecting on fail-over or connection lost
                         .id("orderInputEndPoint")
                         .destination(sourceQueue)
                         .jmsMessageConverter(new MarshallingMessageConverter(jaxbMarshaller()))
